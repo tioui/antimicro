@@ -1,3 +1,20 @@
+/* antimicro Gamepad to KB+M event mapper
+ * Copyright (C) 2015 Travis Nickles <nickles.travis@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef BUTTONEDITDIALOGTWO_H
 #define BUTTONEDITDIALOGTWO_H
 
@@ -6,6 +23,8 @@
 #include "joybutton.h"
 #include "keyboard/virtualkeyboardmousewidget.h"
 #include "advancebuttondialog.h"
+#include "uihelpers/buttoneditdialoghelper.h"
+
 
 namespace Ui {
 class ButtonEditDialog;
@@ -22,6 +41,7 @@ public:
 protected:
     JoyButton *button;
     bool ignoreRelease;
+    ButtonEditDialogHelper helper;
 
     virtual void keyReleaseEvent(QKeyEvent *event);
     virtual void keyPressEvent(QKeyEvent *event);
@@ -42,13 +62,15 @@ private slots:
     void changeTurboSetting();
     void openAdvancedDialog();
     void closedAdvancedDialog();
-    void createTempSlot(int keycode);
+    void createTempSlot(int keycode, unsigned int alias);
 
     void checkTurboSetting(bool state);
     void setTurboButtonEnabled(bool state);
     void processSlotAssignment(JoyButtonSlot *tempslot);
     void clearButtonSlots();
     void sendSelectionFinished();
+    void updateWindowTitleButtonName();
+    void checkForKeyboardWidgetFocus(QWidget *old, QWidget *now);
 };
 
 #endif // BUTTONEDITDIALOGTWO_H

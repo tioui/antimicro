@@ -1,3 +1,20 @@
+/* antimicro Gamepad to KB+M event mapper
+ * Copyright (C) 2015 Travis Nickles <nickles.travis@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <QPainter>
 #include <qdrawutil.h>
 
@@ -19,7 +36,7 @@ AxisValueBox::AxisValueBox(QWidget *parent) :
 
 void AxisValueBox::setThrottle(int throttle)
 {
-    if (throttle <= 1 && throttle >= -1)
+    if (throttle <= JoyAxis::PositiveHalfThrottle && throttle >= JoyAxis::NegativeHalfThrottle)
     {
         this->throttle = throttle;
         setValue(joyValue);
@@ -31,17 +48,25 @@ void AxisValueBox::setValue(int value)
 {
     if (value >= JoyAxis::AXISMIN && value <= JoyAxis::AXISMAX)
     {
-        if (throttle == 0)
+        if (throttle == JoyAxis::NormalThrottle)
         {
             this->joyValue = value;
         }
-        else if (throttle == -1)
+        else if (throttle == JoyAxis::NegativeThrottle)
         {
             this->joyValue = (value + JoyAxis::AXISMIN) / 2;
         }
-        else if (throttle == 1)
+        else if (throttle == JoyAxis::PositiveThrottle)
         {
             this->joyValue = (value + JoyAxis::AXISMAX) / 2;
+        }
+        else if (throttle == JoyAxis::NegativeHalfThrottle)
+        {
+            this->joyValue = value <= 0 ? value : -value;
+        }
+        else if (throttle == JoyAxis::PositiveHalfThrottle)
+        {
+            this->joyValue = value >= 0 ? value : -value;
         }
     }
     update();
@@ -158,7 +183,7 @@ void AxisValueBox::paintEvent(QPaintEvent *event)
     brush.setColor(Qt::blue);
     QBrush maxBrush(Qt::red);
 
-    if (throttle == 0)
+    if (throttle == JoyAxis::NormalThrottle)
     {
         qDrawPlainRect(&paint, rboxstart + 2 + deadLine, 2, 4, boxheight + 2, Qt::black, 1, &brush);
         qDrawPlainRect(&paint, lboxend - deadLine - 2, 2, 4, boxheight + 2, Qt::black, 1, &brush);
@@ -167,14 +192,14 @@ void AxisValueBox::paintEvent(QPaintEvent *event)
         qDrawPlainRect(&paint, rboxstart + 2 + maxLine, 2, 4, boxheight + 2, Qt::black, 1, &maxBrush);
         qDrawPlainRect(&paint, lboxend - maxLine - 2, 2, 4, boxheight + 2, Qt::black, 1, &maxBrush);
     }
-    else if (throttle == 1)
+    else if (throttle == JoyAxis::PositiveThrottle || JoyAxis::PositiveHalfThrottle)
     {
         qDrawPlainRect(&paint, lboxstart + deadLine - 2, 2, 4, boxheight + 2, Qt::black, 1, &brush);
         paint.setPen(Qt::red);
         qDrawPlainRect(&paint, lboxstart + maxLine, 2, 4, boxheight + 2, Qt::black, 1, &maxBrush);
     }
 
-    else if (throttle == -1)
+    else if (throttle == JoyAxis::NegativeThrottle || throttle == JoyAxis::NegativeHalfThrottle)
     {
         qDrawPlainRect(&paint, singleend - deadLine - 2, 2, 4, boxheight + 2, Qt::black, 1, &brush);
         paint.setPen(Qt::red);

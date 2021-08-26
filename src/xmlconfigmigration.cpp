@@ -1,33 +1,53 @@
-#include <QDebug>
+/* antimicro Gamepad to KB+M event mapper
+ * Copyright (C) 2015 Travis Nickles <nickles.travis@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include "event.h"
+#include "antkeymapper.h"
+
+#ifdef Q_OS_UNIX
+#include "eventhandlerfactory.h"
+#endif
+
 
 #include "xmlconfigmigration.h"
+
 
 XMLConfigMigration::XMLConfigMigration(QXmlStreamReader *reader, QObject *parent) :
     QObject(parent)
 {
     this->reader = reader;
-    this->fileVersion = reader->attributes().value("configversion").toString().toInt();
-    //fileName = QString(PadderCommon::configPath + "/brony.xml");
-    //configFile = new QFile(fileName);
-    //configFile->open(QFile::WriteOnly | QFile::Text);
-
-    //this->writer = new QXmlStreamWriter();
-    //writer->setAutoFormatting(true);
-}
-
-XMLConfigMigration::~XMLConfigMigration()
-{
-    /*if (writer)
+    if (reader->device() && reader->device()->isOpen())
     {
-        delete writer;
-        writer = 0;
-    }*/
+        this->fileVersion = reader->attributes().value("configversion").toString().toInt();
+    }
+    else
+    {
+        this->fileVersion = 0;
+    }
 }
 
 bool XMLConfigMigration::requiresMigration()
 {
     bool toMigrate = false;
-    if (fileVersion < PadderCommon::LATESTCONFIGFILEVERSION)
+    if (fileVersion == 0)
+    {
+        toMigrate = false;
+    }
+    else if (fileVersion >= 2 && fileVersion <= PadderCommon::LATESTCONFIGMIGRATIONVERSION)
     {
         toMigrate = true;
     }
@@ -41,317 +61,121 @@ QString XMLConfigMigration::migrate()
     if (requiresMigration())
     {
         int tempFileVersion = fileVersion;
-        if (tempFileVersion == 0)
+        QString initialData = readConfigToString();
+        reader->clear();
+        reader->addData(initialData);
+
+        if (tempFileVersion >= 2 && tempFileVersion <= 5)
         {
-            tempXmlString = initialMigration();
-            reader->clear();
-            reader->addData(tempXmlString);
-            tempFileVersion = 1;
+            tempXmlString = version0006Migration();
+            tempFileVersion = PadderCommon::LATESTCONFIGFILEVERSION;
         }
-        /*if (tempFileVersion == 1)
-        {
-            tempXmlString = version0001Migration();
-            tempFileVersion = 2;
-        }*/
     }
+
     return tempXmlString;
 }
 
-QString XMLConfigMigration::initialMigration()
+QString XMLConfigMigration::readConfigToString()
+{
+    QString tempXmlString;
+    QXmlStreamWriter writer(&tempXmlString);
+    writer.setAutoFormatting(true);
+    while (!reader->atEnd())
+    {
+        writer.writeCurrentToken(*reader);
+        reader->readNext();
+    }
+
+    return tempXmlString;
+}
+
+QString XMLConfigMigration::version0006Migration()
 {
     QString tempXmlString;
     QXmlStreamWriter writer(&tempXmlString);
     writer.setAutoFormatting(true);
     reader->readNextStartElement();
+    reader->readNextStartElement();
 
     writer.writeStartDocument();
     writer.writeStartElement("joystick");
-    writer.writeAttribute("configversion", QString::number(PadderCommon::LATESTCONFIGFILEVERSION));
+    writer.writeAttribute("configversion", QString::number(6));
+    writer.writeAttribute("appversion", PadderCommon::programVersion);
 
     while (!reader->atEnd())
     {
-        if (reader->name() == "button" && reader->isStartElement())
+        if (reader->name() == "slot" && reader->isStartElement())
         {
-            initialMigrationReadButton(writer);
-        }
-
-        else if (reader->name() == "axis" && reader->isStartElement())
-        {
-            int axismode = 0;
-            int mousemode = 0;
-            int pkeycode = 0;
-            int nkeycode = 0;
-            int mousespeed = 30;
-
+            unsigned int slotcode = 0;
+            QString slotmode;
             writer.writeCurrentToken(*reader);
-            reader->readNextStartElement();
-            while (!reader->atEnd() && (!reader->isEndElement() && reader->name() != "axis"))
+            reader->readNext();
+
+            // Grab current slot code and slot mode
+            while (!reader->atEnd() && (!reader->isEndElement() && reader->name() != "slot"))
             {
-                if (reader->name() == "axismode" && reader->isStartElement())
+                if (reader->name() == "code" && reader->isStartElement())
                 {
-                    QString temptext = reader->readElementText();
-                    axismode = temptext.toInt();
+                    QString tempcode = reader->readElementText();
+                    slotcode = tempcode.toInt();
                 }
-                else if (reader->name() == "mousemode" && reader->isStartElement())
+                else if (reader->name() == "mode" && reader->isStartElement())
                 {
-                    QString temptext = reader->readElementText();
-                    mousemode = temptext.toInt();
-                }
-                else if (reader->name() == "pkeycode" && reader->isStartElement())
-                {
-                    QString temptext = reader->readElementText();
-                    pkeycode = temptext.toInt();
-                }
-                else if (reader->name() == "nkeycode" && reader->isStartElement())
-                {
-                    QString temptext = reader->readElementText();
-                    nkeycode = temptext.toInt();
-                }
-                else if (reader->name() == "mousespeed" && reader->isStartElement())
-                {
-                    QString temptext = reader->readElementText();
-                    mousespeed = temptext.toInt();
-                }
-                else if (reader->name() == "deadZone" && reader->isStartElement())
-                {
-                    writer.writeCurrentToken(*reader);
-                    writer.writeCharacters(reader->readElementText());
-                    writer.writeEndElement();
-                }
-                else if (reader->name() == "maxZone" && reader->isStartElement())
-                {
-                    writer.writeCurrentToken(*reader);
-                    writer.writeCharacters(reader->readElementText());
-                    writer.writeEndElement();
-                }
-                else if (reader->name() == "throttle" && reader->isStartElement())
-                {
-                    writer.writeCurrentToken(*reader);
-                    writer.writeCharacters(reader->readElementText());
-                    writer.writeEndElement();
-                }
-
-                reader->readNextStartElement();
-            }
-
-            writer.writeStartElement("axisbutton");
-            writer.writeAttribute("index", QString::number(1));
-
-            writer.writeStartElement("slots");
-            if (axismode == 0)
-            {
-                bool usingMouse = false;
-                if (nkeycode > 400)
-                {
-                    nkeycode -= 400;
-                    usingMouse = true;
-                }
-
-                writer.writeStartElement("slot");
-                writer.writeTextElement("code", QString::number(nkeycode));
-                if (!usingMouse)
-                {
-                    writer.writeTextElement("mode", "keyboard");
+                    slotmode = reader->readElementText();
                 }
                 else
                 {
-                    writer.writeTextElement("mode", "mousebutton");
+                    writer.writeCurrentToken(*reader);
                 }
-                writer.writeEndElement();
+
+                reader->readNext();
             }
-            else
+
+            // Reformat slot code if associated with the keyboard
+            if (slotcode && !slotmode.isEmpty())
             {
-                if (mousemode == 0)
+                if (slotmode == "keyboard")
                 {
-                    writer.writeStartElement("slot");
-                    writer.writeTextElement("code", QString::number(3));
-                    writer.writeTextElement("mode", "mousemovement");
-                    writer.writeEndElement();
-                }
-                else if (mousemode == 1)
-                {
-                    writer.writeStartElement("slot");
-                    writer.writeTextElement("code", QString::number(4));
-                    writer.writeTextElement("mode", "mousemovement");
-                    writer.writeEndElement();
-                }
-                else if (mousemode == 2)
-                {
-                    writer.writeStartElement("slot");
-                    writer.writeTextElement("code", QString::number(1));
-                    writer.writeTextElement("mode", "mousemovement");
-                    writer.writeEndElement();
-                }
-                else if (mousemode == 3)
-                {
-                    writer.writeStartElement("slot");
-                    writer.writeTextElement("code", QString::number(2));
-                    writer.writeTextElement("mode", "mousemovement");
-                    writer.writeEndElement();
-                }
-            }
-            writer.writeEndElement();
+                    unsigned int tempcode = slotcode;
+#ifdef Q_OS_WIN
+                    slotcode = AntKeyMapper::getInstance()->returnQtKey(slotcode);
+#else
+                    BaseEventHandler *handler = EventHandlerFactory::getInstance()->handler();
+                    if (handler->getIdentifier() == "xtest")
+                    {
+                        slotcode = AntKeyMapper::getInstance()->returnQtKey(X11KeyCodeToX11KeySym(slotcode));
+                    }
+                    else
+                    {
+                        slotcode = 0;
+                        tempcode = 0;
+                    }
 
-            writer.writeTextElement("toggle", "0");
-            writer.writeTextElement("useturbo", "false");
-            writer.writeTextElement("turboInterval", "0");
-            writer.writeTextElement("mousespeedx", QString::number(mousespeed));
-            writer.writeTextElement("mousespeedy", QString::number(mousespeed));
-
-            writer.writeEndElement();
-
-            writer.writeStartElement("axisbutton");
-            writer.writeAttribute("index", QString::number(2));
-
-            writer.writeStartElement("slots");
-            if (axismode == 0)
-            {
-                bool usingMouse = false;
-                if (pkeycode > 400)
-                {
-                    pkeycode -= 400;
-                    usingMouse = true;
-                }
-
-                writer.writeStartElement("slot");
-                writer.writeTextElement("code", QString::number(pkeycode));
-                if (!usingMouse)
-                {
-                    writer.writeTextElement("mode", "keyboard");
+#endif
+                    if (slotcode > 0)
+                    {
+                        writer.writeTextElement("code", QString("0x%1").arg(slotcode, 0, 16));
+                    }
+                    else if (tempcode > 0)
+                    {
+                        writer.writeTextElement("code", QString("0x%1").arg(tempcode | QtKeyMapperBase::nativeKeyPrefix, 0, 16));
+                    }
                 }
                 else
                 {
-                    writer.writeTextElement("mode", "mousebutton");
+                    writer.writeTextElement("code", QString::number(slotcode));
                 }
-                writer.writeEndElement();
+
+                writer.writeTextElement("mode", slotmode);
             }
-            else
-            {
-                if (mousemode == 0)
-                {
-                    writer.writeStartElement("slot");
-                    writer.writeTextElement("code", QString::number(4));
-                    writer.writeTextElement("mode", "mousemovement");
-                    writer.writeEndElement();
-                }
-                else if (mousemode == 1)
-                {
-                    writer.writeStartElement("slot");
-                    writer.writeTextElement("code", QString::number(3));
-                    writer.writeTextElement("mode", "mousemovement");
-                    writer.writeEndElement();
-                }
-                else if (mousemode == 2)
-                {
-                    writer.writeStartElement("slot");
-                    writer.writeTextElement("code", QString::number(2));
-                    writer.writeTextElement("mode", "mousemovement");
-                    writer.writeEndElement();
-                }
-                else if (mousemode == 3)
-                {
-                    writer.writeStartElement("slot");
-                    writer.writeTextElement("code", QString::number(1));
-                    writer.writeTextElement("mode", "mousemovement");
-                    writer.writeEndElement();
-                }
-            }
-
-            writer.writeEndElement();
-
-            writer.writeTextElement("toggle", "0");
-            writer.writeTextElement("useturbo", "false");
-            writer.writeTextElement("turboInterval", "0");
-
-            writer.writeEndElement();
-
-            writer.writeEndElement();
+            writer.writeCurrentToken(*reader);
         }
-
-        else if (reader->name() == "dpad" && reader->isStartElement())
+        else
         {
             writer.writeCurrentToken(*reader);
-            reader->readNextStartElement();
-
-            while (!reader->atEnd() && (!reader->isEndElement() && reader->name() != "dpad"))
-            {
-                initialMigrationReadButton(writer);
-                reader->readNextStartElement();
-            }
-
-            writer.writeEndElement();
         }
-
-        reader->readNextStartElement();
+        reader->readNext();
     }
 
-    writer.writeEndElement();
-    writer.writeEndDocument();
-
-    //qDebug() << tempXmlString << endl;
     return tempXmlString;
-}
-
-void XMLConfigMigration::initialMigrationReadButton(QXmlStreamWriter &writer)
-{
-    QString tagname = reader->name().toString();
-    int keycode = 0;
-    bool usemouse = false;
-    int mousecode = 0;
-
-    writer.writeCurrentToken(*reader);
-    reader->readNextStartElement();
-
-    while (!reader->atEnd() && (!reader->isEndElement() && reader->name() != tagname))
-    {
-        if (reader->name() == "keycode" && reader->isStartElement())
-        {
-            QString tempcode = reader->readElementText();
-            keycode = tempcode.toInt();
-        }
-        else if (reader->name() == "usemouse" && reader->isStartElement())
-        {
-            QString tempchoice = reader->readElementText();
-            usemouse = (tempchoice == "true") ? true : false;
-        }
-        else if (reader->name() == "mousecode" && reader->isStartElement())
-        {
-            QString tempchoice = reader->readElementText();
-            mousecode = tempchoice.toInt();
-        }
-        else if (reader->name() == "toggle" && reader->isStartElement())
-        {
-            writer.writeCurrentToken(*reader);
-            writer.writeCharacters(reader->readElementText());
-            writer.writeEndElement();
-        }
-        else if (reader->name() == "turboInterval" && reader->isStartElement())
-        {
-            writer.writeCurrentToken(*reader);
-            writer.writeCharacters(reader->readElementText());
-            writer.writeEndElement();
-        }
-        reader->readNextStartElement();
-    }
-
-    writer.writeTextElement("mousespeedx", QString::number(30));
-    writer.writeTextElement("mousespeedy", QString::number(30));
-
-    writer.writeStartElement("slots");
-    if (usemouse)
-    {
-        writer.writeStartElement("slot");
-        writer.writeTextElement("code", QString::number(mousecode));
-        writer.writeTextElement("mode", "mousebutton");
-        writer.writeEndElement();
-    }
-    else if (keycode > 0)
-    {
-        writer.writeStartElement("slot");
-        writer.writeTextElement("code", QString::number(keycode));
-        writer.writeTextElement("mode", "keyboard");
-        writer.writeEndElement();
-    }
-    writer.writeEndElement();
-    writer.writeEndElement();
 }

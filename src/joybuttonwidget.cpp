@@ -1,22 +1,41 @@
-#include <QDebug>
-#include <QStyle>
-#include <QFontMetrics>
-#include <QPainter>
+/* antimicro Gamepad to KB+M event mapper
+ * Copyright (C) 2015 Travis Nickles <nickles.travis@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+#include <QMenu>
 
 #include "joybuttonwidget.h"
+#include "joybuttoncontextmenu.h"
 
-JoyButtonWidget::JoyButtonWidget(JoyButton *button, QWidget *parent) :
-    QPushButton(parent)
+JoyButtonWidget::JoyButtonWidget(JoyButton *button, bool displayNames, QWidget *parent) :
+    FlashButtonWidget(displayNames, parent)
 {
     this->button = button;
 
-    isflashing = false;
-
     refreshLabel();
+    enableFlashes();
 
-    connect(button, SIGNAL(clicked(int)), this, SLOT(flash()));
-    connect(button, SIGNAL(released(int)), this, SLOT(unflash()));
-    connect(button, SIGNAL(slotsChanged()), this, SLOT(refreshLabel()));
+    tryFlash();
+
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showContextMenu(const QPoint&)));
+
+    //connect(button, SIGNAL(slotsChanged()), this, SLOT(refreshLabel()));
+    connect(button, SIGNAL(propertyUpdated()), this, SLOT(refreshLabel()));
+    connect(button, SIGNAL(activeZoneChanged()), this, SLOT(refreshLabel()));
 }
 
 JoyButton* JoyButtonWidget::getJoyButton()
@@ -24,74 +43,38 @@ JoyButton* JoyButtonWidget::getJoyButton()
     return button;
 }
 
-void JoyButtonWidget::flash()
-{
-    isflashing = true;
-
-    this->style()->unpolish(this);
-    this->style()->polish(this);
-
-    emit flashed(isflashing);
-}
-
-void JoyButtonWidget::unflash()
-{
-    isflashing = false;
-
-    this->style()->unpolish(this);
-    this->style()->polish(this);
-
-    emit flashed(isflashing);
-}
-
-void JoyButtonWidget::refreshLabel()
-{
-    setText(generateLabel());
-}
-
 void JoyButtonWidget::disableFlashes()
 {
-    disconnect (button, SIGNAL(clicked(int)), 0, 0);
-    disconnect (button, SIGNAL(released(int)), 0, 0);
+    disconnect(button, SIGNAL(clicked(int)), this, SLOT(flash()));
+    disconnect(button, SIGNAL(released(int)), this, SLOT(unflash()));
     this->unflash();
 }
 
 void JoyButtonWidget::enableFlashes()
 {
-    connect (button, SIGNAL(clicked(int)), this, SLOT(flash()));
-    connect (button, SIGNAL(released(int)), this, SLOT(unflash()));
-}
-
-bool JoyButtonWidget::isButtonFlashing()
-{
-    return isflashing;
+    connect(button, SIGNAL(clicked(int)), this, SLOT(flash()), Qt::QueuedConnection);
+    connect(button, SIGNAL(released(int)), this, SLOT(unflash()), Qt::QueuedConnection);
 }
 
 QString JoyButtonWidget::generateLabel()
 {
     QString temp;
-    temp = button->getName().replace("&", "&&");
+    temp = button->getName(false, displayNames).replace("&", "&&");
     return temp;
 }
 
-void JoyButtonWidget::paintEvent(QPaintEvent *event)
+void JoyButtonWidget::showContextMenu(const QPoint &point)
 {
-    Q_UNUSED(event);
+    QPoint globalPos = this->mapToGlobal(point);
+    JoyButtonContextMenu *contextMenu = new JoyButtonContextMenu(button, this);
+    contextMenu->buildMenu();
+    contextMenu->popup(globalPos);
+}
 
-    QPainter painter(this);
-
-    QFontMetrics fm = this->fontMetrics();
-    QFont tempWidgetFont = this->font();
-    QFont tempScaledFont = painter.font();
-
-    while ((this->width() < fm.width(text())) && tempScaledFont.pointSize() >= 6)
+void JoyButtonWidget::tryFlash()
+{
+    if (button->getButtonState())
     {
-        tempScaledFont.setPointSize(painter.font().pointSize()-2);
-        painter.setFont(tempScaledFont);
-        fm = painter.fontMetrics();
+        flash();
     }
-
-    this->setFont(tempScaledFont);
-    QPushButton::paintEvent(event);
-    this->setFont(tempWidgetFont);
 }

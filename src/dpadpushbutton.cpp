@@ -1,18 +1,37 @@
-#include <QDebug>
-#include <QStyle>
-#include <QFontMetrics>
-#include <QPainter>
+/* antimicro Gamepad to KB+M event mapper
+ * Copyright (C) 2015 Travis Nickles <nickles.travis@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "dpadpushbutton.h"
+#include "dpadcontextmenu.h"
 
-DPadPushButton::DPadPushButton(JoyDPad *dpad, QWidget *parent) :
-    QPushButton(parent)
+DPadPushButton::DPadPushButton(JoyDPad *dpad, bool displayNames, QWidget *parent) :
+    FlashButtonWidget(displayNames, parent)
 {
     this->dpad = dpad;
 
-    isflashing = false;
     refreshLabel();
     enableFlashes();
+
+    tryFlash();
+
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showContextMenu(const QPoint&)));
+
+    connect(dpad, SIGNAL(dpadNameChanged()), this, SLOT(refreshLabel()));
 }
 
 JoyDPad* DPadPushButton::getDPad()
@@ -20,81 +39,46 @@ JoyDPad* DPadPushButton::getDPad()
     return dpad;
 }
 
-void DPadPushButton::flash()
-{
-    isflashing = true;
-
-    this->style()->unpolish(this);
-    this->style()->polish(this);
-
-    emit flashed(isflashing);
-}
-
-void DPadPushButton::unflash()
-{
-    isflashing = false;
-
-    this->style()->unpolish(this);
-    this->style()->polish(this);
-
-    emit flashed(isflashing);
-}
-
-void DPadPushButton::refreshLabel()
-{
-    setText(generateLabel());
-}
-
 QString DPadPushButton::generateLabel()
 {
     QString temp;
-    temp = tr("DPad").append(" ").append(QString::number(dpad->getRealJoyNumber()));
+    if (!dpad->getDpadName().isEmpty())
+    {
+        temp.append(dpad->getName(false, displayNames));
+    }
+    else
+    {
+        temp.append(dpad->getName());
+    }
+
     return temp;
 }
 
 void DPadPushButton::disableFlashes()
 {
-    disconnect(dpad, SIGNAL(active(int)), 0, 0);
-    disconnect(dpad, SIGNAL(released(int)), 0, 0);
+    disconnect(dpad, SIGNAL(active(int)), this, SLOT(flash()));
+    disconnect(dpad, SIGNAL(released(int)), this, SLOT(unflash()));
     this->unflash();
 }
 
 void DPadPushButton::enableFlashes()
 {
-    connect(dpad, SIGNAL(active(int)), this, SLOT(flash()));
-    connect(dpad, SIGNAL(released(int)), this, SLOT(unflash()));
+    connect(dpad, SIGNAL(active(int)), this, SLOT(flash()), Qt::QueuedConnection);
+    connect(dpad, SIGNAL(released(int)), this, SLOT(unflash()), Qt::QueuedConnection);
 }
 
-bool DPadPushButton::isButtonFlashing()
+void DPadPushButton::showContextMenu(const QPoint &point)
 {
-    return isflashing;
+    QPoint globalPos = this->mapToGlobal(point);
+    DPadContextMenu *contextMenu = new DPadContextMenu(dpad, this);
+    contextMenu->buildMenu();
+    contextMenu->popup(globalPos);
 }
 
-void DPadPushButton::paintEvent(QPaintEvent *event)
+void DPadPushButton::tryFlash()
 {
-    Q_UNUSED(event);
-
-    QPainter painter(this);
-
-    QFontMetrics fm = this->fontMetrics();
-    //QString temp = stick->getName();
-    QFont tempWidgetFont = this->font();
-    //QFontMetrics fm(this->font());
-    //QString temp = fm.elidedText(stick->getName(), Qt::ElideRight, this->width());
-    //this->setText(temp);
-    //qDebug() << "FM WIDTH B4: " << fm.width(stick->getName()) << " " << text();
-    QFont tempScaledFont = painter.font();
-
-    while ((this->width() < fm.width(text())) && tempScaledFont.pointSize() >= 6)
+    if (dpad->getCurrentDirection() != static_cast<int>(JoyDPadButton::DpadCentered))
     {
-        tempScaledFont.setPointSize(painter.font().pointSize()-2);
-        painter.setFont(tempScaledFont);
-        fm = painter.fontMetrics();
-        //qDebug() << "TEMP SIZE: " << tempScaledFont.pointSize() << endl;
+        flash();
     }
-    //qDebug() << "FM WIDTH NOW: " << fm.width(stick->getName()) << " " << text();
-
-    this->setFont(tempScaledFont);
-    QPushButton::paintEvent(event);
-    this->setFont(tempWidgetFont);
 }

@@ -1,8 +1,27 @@
-#include <QDebug>
+/* antimicro Gamepad to KB+M event mapper
+ * Copyright (C) 2015 Travis Nickles <nickles.travis@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+//#include <QDebug>
 #include <QPainter>
 
 #include "virtualkeypushbutton.h"
-#include "event.h"
+#include <event.h>
+#include <antkeymapper.h>
+#include <eventhandlerfactory.h>
 
 QHash<QString, QString> VirtualKeyPushButton::knownAliases = QHash<QString, QString> ();
 
@@ -11,9 +30,10 @@ VirtualKeyPushButton::VirtualKeyPushButton(JoyButton *button, QString xcodestrin
 {
     populateKnownAliases();
 
-    //qDebug() << "Question: " << keyToKeycode("KP_7") << endl;
-    //qDebug() << "Question: " << keycodeToKey(79) << endl;
+    //qDebug() << "Question: " << X11KeySymToKeycode("KP_7") << endl;
+    //qDebug() << "Question: " << X11KeySymToKeycode(79) << endl;
     this->keycode = 0;
+    this->qkeyalias = 0;
     this->xcodestring = "";
     this->displayString = "";
     this->currentlyActive = false;
@@ -23,12 +43,47 @@ VirtualKeyPushButton::VirtualKeyPushButton(JoyButton *button, QString xcodestrin
     int temp = 0;
     if (!xcodestring.isEmpty())
     {
-        temp = keyToKeycode(xcodestring);
+        temp = X11KeySymToKeycode(xcodestring);
+#ifdef Q_OS_UNIX
+        BaseEventHandler *handler = EventHandlerFactory::getInstance()->handler();
+        if (handler->getIdentifier() == "xtest")
+        {
+            temp = X11KeyCodeToX11KeySym(temp);
+        }
+#endif
     }
 
     if (temp > 0)
     {
+#ifdef Q_OS_WIN
+        //static QtWinKeyMapper nativeWinKeyMapper;
+        BaseEventHandler *handler = EventHandlerFactory::getInstance()->handler();
+
+  #ifdef WITH_VMULTI
+        if (handler->getIdentifier() == "vmulti")
+        {
+            QtKeyMapperBase *nativeWinKeyMapper = AntKeyMapper::getInstance()->getNativeKeyMapper();
+            this->qkeyalias = nativeWinKeyMapper->returnQtKey(temp);
+            this->keycode = AntKeyMapper::getInstance()->returnVirtualKey(qkeyalias);
+        }
+  #endif
+        BACKEND_ELSE_IF (handler->getIdentifier() == "sendinput")
+        {
+            this->keycode = temp;
+            this->qkeyalias = AntKeyMapper::getInstance()->returnQtKey(this->keycode);
+        }
+
+        // Special exception for Numpad Enter on Windows.
+        if (xcodestring == "KP_Enter")
+        {
+            this->qkeyalias = Qt::Key_Enter;
+        }
+#else
         this->keycode = temp;
+        //this->keycode = X11KeyCodeToX11KeySym(temp);
+        this->qkeyalias = AntKeyMapper::getInstance()->returnQtKey(this->keycode);
+        //this->keycode = temp;
+#endif
         this->xcodestring = xcodestring;
         this->displayString = setDisplayString(xcodestring);
     }
@@ -40,7 +95,7 @@ VirtualKeyPushButton::VirtualKeyPushButton(JoyButton *button, QString xcodestrin
 
 void VirtualKeyPushButton::processSingleSelection()
 {
-    emit keycodeObtained(keycode);
+    emit keycodeObtained(keycode, qkeyalias);
 }
 
 QString VirtualKeyPushButton::setDisplayString(QString xcodestring)
@@ -52,7 +107,8 @@ QString VirtualKeyPushButton::setDisplayString(QString xcodestring)
     }
     else
     {
-        temp = keycodeToKey(keyToKeycode(xcodestring));
+        temp = keycodeToKeyString(X11KeySymToKeycode(xcodestring));
+        //temp = keycodeToKeyString(X11KeySymToKeycode(xcodestring));
     }
 
     if (temp.isEmpty() && !xcodestring.isEmpty())
@@ -63,6 +119,8 @@ QString VirtualKeyPushButton::setDisplayString(QString xcodestring)
     return temp.toUpper();
 }
 
+// Define display strings that will be used for various keys on the
+// virtual keyboard.
 void VirtualKeyPushButton::populateKnownAliases()
 {
     if (knownAliases.isEmpty())
@@ -75,6 +133,7 @@ void VirtualKeyPushButton::populateKnownAliases()
         knownAliases.insert("Control_R", tr("Ctrl (R)"));
         knownAliases.insert("Alt_L", tr("Alt (L)"));
         knownAliases.insert("Alt_R", tr("Alt (R)"));
+        knownAliases.insert("Multi_key", tr("Alt (R)"));
         knownAliases.insert("grave", tr("`"));
         knownAliases.insert("asciitilde", tr("~"));
         knownAliases.insert("minus", tr("-"));
@@ -115,27 +174,26 @@ void VirtualKeyPushButton::populateKnownAliases()
         knownAliases.insert("asterisk", tr("*"));
         knownAliases.insert("less", tr("<"));
         knownAliases.insert("colon", tr(":"));
+        knownAliases.insert("Super_L", tr("Super (L)"));
+        knownAliases.insert("Menu", tr("Menu"));
+        knownAliases.insert("Up", tr("Up"));
+        knownAliases.insert("Down", tr("Down"));
+        knownAliases.insert("Left", tr("Left"));
+        knownAliases.insert("Right", tr("Right"));
     }
 }
 
-void VirtualKeyPushButton::paintEvent(QPaintEvent *event)
+int VirtualKeyPushButton::calculateFontSize()
 {
-    Q_UNUSED(event);
+    QFont tempScaledFont(this->font());
+    tempScaledFont.setPointSize(10);
+    QFontMetrics fm(tempScaledFont);
 
-    QPainter painter(this);
-
-    QFontMetrics fm = this->fontMetrics();
-    QFont tempWidgetFont = this->font();
-    QFont tempScaledFont = painter.font();
-
-    while ((this->width() < fm.boundingRect(this->rect(), Qt::AlignCenter, this->text()).width()) && tempScaledFont.pointSize() >= 5)
+    while (((this->width()-4) < fm.boundingRect(this->rect(), Qt::AlignCenter, this->text()).width()) && tempScaledFont.pointSize() >= 6)
     {
-        tempScaledFont.setPointSize(painter.font().pointSize()-1);
-        painter.setFont(tempScaledFont);
-        fm = painter.fontMetrics();
+        tempScaledFont.setPointSize(tempScaledFont.pointSize()-1);
+        fm = QFontMetrics(tempScaledFont);
     }
 
-    this->setFont(tempScaledFont);
-    QPushButton::paintEvent(event);
-    this->setFont(tempWidgetFont);
+    return tempScaledFont.pointSize();
 }

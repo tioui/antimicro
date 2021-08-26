@@ -1,39 +1,51 @@
+/* antimicro Gamepad to KB+M event mapper
+ * Copyright (C) 2015 Travis Nickles <nickles.travis@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef DPADPUSHBUTTON_H
 #define DPADPUSHBUTTON_H
 
-#include <QPushButton>
-#include <QPaintEvent>
+#include <QPoint>
 
+#include "flashbuttonwidget.h"
 #include "joydpad.h"
 
-class DPadPushButton : public QPushButton
+class DPadPushButton : public FlashButtonWidget
 {
     Q_OBJECT
-    Q_PROPERTY(bool isflashing READ isButtonFlashing)
 
 public:
-    explicit DPadPushButton(JoyDPad *dpad, QWidget *parent = 0);
+    explicit DPadPushButton(JoyDPad *dpad, bool displayNames, QWidget *parent = 0);
+
     JoyDPad* getDPad();
-    bool isButtonFlashing();
+    void tryFlash();
 
 protected:
-    virtual void paintEvent(QPaintEvent *event);
     QString generateLabel();
 
     JoyDPad *dpad;
-    bool isflashing;
 
 signals:
-    void flashed(bool flashing);
 
 public slots:
-    void refreshLabel();
-    void unflash();
     void disableFlashes();
     void enableFlashes();
 
 private slots:
-    void flash();
+    void showContextMenu(const QPoint &point);
 };
 
 #endif // DPADPUSHBUTTON_H

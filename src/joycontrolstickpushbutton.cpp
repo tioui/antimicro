@@ -1,21 +1,38 @@
-#include <QDebug>
-#include <QStyle>
-#include <QFontMetrics>
-#include <QPainter>
+/* antimicro Gamepad to KB+M event mapper
+ * Copyright (C) 2015 Travis Nickles <nickles.travis@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "joycontrolstickpushbutton.h"
+#include "joycontrolstickcontextmenu.h"
 
-JoyControlStickPushButton::JoyControlStickPushButton(JoyControlStick *stick, QWidget *parent) :
-    QPushButton(parent)
+JoyControlStickPushButton::JoyControlStickPushButton(JoyControlStick *stick, bool displayNames, QWidget *parent) :
+    FlashButtonWidget(displayNames, parent)
 {
     this->stick = stick;
 
-    isflashing = false;
-
     refreshLabel();
 
-    connect(stick, SIGNAL(active(int, int)), this, SLOT(flash()));
-    connect(stick, SIGNAL(released(int, int)), this, SLOT(unflash()));
+    tryFlash();
+
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showContextMenu(const QPoint&)));
+
+    connect(stick, SIGNAL(active(int, int)), this, SLOT(flash()), Qt::QueuedConnection);
+    connect(stick, SIGNAL(released(int, int)), this, SLOT(unflash()), Qt::QueuedConnection);
+    connect(stick, SIGNAL(stickNameChanged()), this, SLOT(refreshLabel()));
 }
 
 JoyControlStick* JoyControlStickPushButton::getStick()
@@ -23,81 +40,50 @@ JoyControlStick* JoyControlStickPushButton::getStick()
     return stick;
 }
 
-void JoyControlStickPushButton::flash()
-{
-    isflashing = true;
-
-    this->style()->unpolish(this);
-    this->style()->polish(this);
-
-    emit flashed(isflashing);
-}
-
-void JoyControlStickPushButton::unflash()
-{
-    isflashing = false;
-
-    this->style()->unpolish(this);
-    this->style()->polish(this);
-
-    emit flashed(isflashing);
-}
-
-void JoyControlStickPushButton::refreshLabel()
-{
-    setText(generateLabel());
-}
-
+/**
+ * @brief Generate the string that will be displayed on the button
+ * @return Display string
+ */
 QString JoyControlStickPushButton::generateLabel()
 {
     QString temp;
-    temp = tr("Stick").append(" ").append(QString::number(stick->getRealJoyIndex()));
+    if (!stick->getStickName().isEmpty() && displayNames)
+    {
+        temp.append(stick->getPartialName(false, true));
+    }
+    else
+    {
+        temp.append(stick->getPartialName(false));
+    }
+
     return temp;
 }
 
 void JoyControlStickPushButton::disableFlashes()
 {
-    disconnect(stick, SIGNAL(active(int, int)), 0, 0);
-    disconnect(stick, SIGNAL(released(int, int)), 0, 0);
+    disconnect(stick, SIGNAL(active(int, int)), this, SLOT(flash()));
+    disconnect(stick, SIGNAL(released(int, int)), this, SLOT(unflash()));
     this->unflash();
 }
 
 void JoyControlStickPushButton::enableFlashes()
 {
-    connect(stick, SIGNAL(active(int, int)), this, SLOT(flash()));
-    connect(stick, SIGNAL(released(int, int)), this, SLOT(unflash()));
+    connect(stick, SIGNAL(active(int, int)), this, SLOT(flash()), Qt::QueuedConnection);
+    connect(stick, SIGNAL(released(int, int)), this, SLOT(unflash()), Qt::QueuedConnection);
 }
 
-bool JoyControlStickPushButton::isButtonFlashing()
+void JoyControlStickPushButton::showContextMenu(const QPoint &point)
 {
-    return isflashing;
+    QPoint globalPos = this->mapToGlobal(point);
+    JoyControlStickContextMenu *contextMenu = new JoyControlStickContextMenu(stick, this);
+    contextMenu->buildMenu();
+    contextMenu->popup(globalPos);
 }
 
-void JoyControlStickPushButton::paintEvent(QPaintEvent *event)
+void JoyControlStickPushButton::tryFlash()
 {
-    Q_UNUSED(event);
-
-    QPainter painter(this);
-
-    QFontMetrics fm = this->fontMetrics();
-    //QString temp = stick->getName();
-    QFont tempWidgetFont = this->font();
-    //QFontMetrics fm(this->font());
-    //QString temp = fm.elidedText(stick->getName(), Qt::ElideRight, this->width());
-    //this->setText(temp);
-    //qDebug() << "FM WIDTH B4: " << fm.width(stick->getName()) << " " << text();
-    QFont tempScaledFont = painter.font();
-
-    while ((this->width() < fm.width(generateLabel())) && tempScaledFont.pointSize() >= 6)
+    if (stick->getCurrentDirection() != JoyControlStick::StickCentered)
     {
-        tempScaledFont.setPointSize(painter.font().pointSize()-2);
-        painter.setFont(tempScaledFont);
-        fm = painter.fontMetrics();
-        //qDebug() << "TEMP SIZE: " << tempScaledFont.pointSize() << endl;
+        flash();
     }
-    //qDebug() << "FM WIDTH NOW: " << fm.width(stick->getName()) << " " << text();
-
-    this->setFont(tempScaledFont);
-    QPushButton::paintEvent(event);
-    this->setFont(tempWidgetFont);
 }

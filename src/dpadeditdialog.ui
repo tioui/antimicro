@@ -2,18 +2,21 @@
 <ui version="4.0">
  <class>DPadEditDialog</class>
  <widget class="QDialog" name="DPadEditDialog">
+  <property name="windowModality">
+   <enum>Qt::WindowModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>574</width>
-    <height>305</height>
+    <width>528</width>
+    <height>334</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout_3">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
@@ -87,7 +90,7 @@
        <item>
         <widget class="QLabel" name="label_11">
          <property name="text">
-          <string>Mode:</string>
+          <string>Dpad Mode:</string>
          </property>
         </widget>
        </item>
@@ -99,6 +102,20 @@
            <height>0</height>
           </size>
          </property>
+         <property name="toolTip">
+          <string>Standard: 8 region stick with two direction buttons active
+when the stick is in a diagonal region.
+
+Eight Way: 8 region stick with each direction having its
+own dedicated button. Only one button is ever active at
+at time. Useful for rougelike games.
+
+4 Way Cardinal: 4 region stick with regions corresponding to
+the cardinal directions of the stick. Useful for menus.
+
+4 Way Diagonal: 4 region stick with each region corresponding
+to a diagonal zone of the stick.</string>
+         </property>
          <item>
           <property name="text">
            <string>Standard</string>
@@ -109,9 +126,102 @@
            <string>Eight Way</string>
           </property>
          </item>
+         <item>
+          <property name="text">
+           <string>4 Way Cardinal</string>
+          </property>
+         </item>
+         <item>
+          <property name="text">
+           <string>4 Way Diagonal</string>
+          </property>
+         </item>
         </widget>
        </item>
       </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <spacer name="verticalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeType">
+      <enum>QSizePolicy::Fixed</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <item>
+      <widget class="QLabel" name="dpadDelayLabel">
+       <property name="text">
+        <string>DPad Delay:</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QSlider" name="dpadDelaySlider">
+       <property name="toolTip">
+        <string>Time lapsed before a direction change is taken into effect.</string>
+       </property>
+       <property name="minimum">
+        <number>0</number>
+       </property>
+       <property name="maximum">
+        <number>100</number>
+       </property>
+       <property name="singleStep">
+        <number>1</number>
+       </property>
+       <property name="pageStep">
+        <number>10</number>
+       </property>
+       <property name="value">
+        <number>0</number>
+       </property>
+       <property name="sliderPosition">
+        <number>0</number>
+       </property>
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="tickPosition">
+        <enum>QSlider::TicksBelow</enum>
+       </property>
+       <property name="tickInterval">
+        <number>0</number>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QDoubleSpinBox" name="dpadDelayDoubleSpinBox">
+       <property name="toolTip">
+        <string>Time lapsed before a direction change is taken into effect.</string>
+       </property>
+       <property name="readOnly">
+        <bool>false</bool>
+       </property>
+       <property name="suffix">
+        <string> s</string>
+       </property>
+       <property name="decimals">
+        <number>2</number>
+       </property>
+       <property name="maximum">
+        <double>1.000000000000000</double>
+       </property>
+       <property name="singleStep">
+        <double>0.010000000000000</double>
+       </property>
+      </widget>
      </item>
     </layout>
    </item>
@@ -132,122 +242,42 @@
     </spacer>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
-     <property name="title">
-      <string>Configure Mouse Settings</string>
+    <layout class="QHBoxLayout" name="horizontalLayout_2">
+     <property name="spacing">
+      <number>10</number>
      </property>
-     <layout class="QVBoxLayout" name="verticalLayout_5">
-      <property name="spacing">
-       <number>20</number>
-      </property>
-      <property name="leftMargin">
-       <number>8</number>
-      </property>
-      <property name="topMargin">
-       <number>8</number>
-      </property>
-      <property name="rightMargin">
-       <number>8</number>
-      </property>
-      <property name="bottomMargin">
-       <number>28</number>
-      </property>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_11">
-        <item>
-         <widget class="QCheckBox" name="changeMouseSpeedsCheckBox">
-          <property name="text">
-           <string>Change Speeds</string>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QCheckBox" name="changeTogetherCheckBox">
-          <property name="enabled">
-           <bool>false</bool>
-          </property>
-          <property name="text">
-           <string>Change Together</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </item>
-      <item>
-       <layout class="QHBoxLayout" name="horizontalLayout_10">
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_2">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_4">
-            <item>
-             <widget class="QLabel" name="label_5">
-              <property name="text">
-               <string>Horizontal Speed:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="horizontalSpinBox">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>300</number>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item alignment="Qt::AlignRight">
-           <widget class="QLabel" name="horizontalSpeedLabel">
-            <property name="text">
-             <string>1 = 20 pps</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QVBoxLayout" name="verticalLayout_4">
-          <item>
-           <layout class="QHBoxLayout" name="horizontalLayout_9">
-            <item>
-             <widget class="QLabel" name="label_7">
-              <property name="text">
-               <string>Vertical Speed:</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QSpinBox" name="verticalSpinBox">
-              <property name="enabled">
-               <bool>false</bool>
-              </property>
-              <property name="minimum">
-               <number>1</number>
-              </property>
-              <property name="maximum">
-               <number>300</number>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item alignment="Qt::AlignRight">
-           <widget class="QLabel" name="verticalSpeedLabel">
-            <property name="text">
-             <string>1 = 20 pps</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </item>
-     </layout>
+     <property name="bottomMargin">
+      <number>6</number>
+     </property>
+     <item>
+      <widget class="QLabel" name="dpadNameLabel">
+       <property name="text">
+        <string>Name:</string>
+       </property>
+       <property name="buddy">
+        <cstring>dpadNameLineEdit</cstring>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QLineEdit" name="dpadNameLineEdit">
+       <property name="toolTip">
+        <string>Specify the name of a dpad.</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QPushButton" name="mouseSettingsPushButton">
+     <property name="text">
+      <string>Mouse Settings</string>
+     </property>
+     <property name="icon">
+      <iconset theme="edit-select">
+       <normaloff/>
+      </iconset>
+     </property>
     </widget>
    </item>
    <item>

@@ -1,27 +1,53 @@
-#include <QDebug>
-#include <QStyle>
-#include <QFontMetrics>
-#include <QPainter>
+/* antimicro Gamepad to KB+M event mapper
+ * Copyright (C) 2015 Travis Nickles <nickles.travis@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "joyaxiswidget.h"
 
-JoyAxisWidget::JoyAxisWidget(JoyAxis *axis, QWidget *parent) :
-    QPushButton(parent)
+#include "joyaxiscontextmenu.h"
+
+JoyAxisWidget::JoyAxisWidget(JoyAxis *axis, bool displayNames, QWidget *parent) :
+    FlashButtonWidget(displayNames, parent)
 {
     this->axis = axis;
 
-    isflashing = false;
+    refreshLabel();
+    enableFlashes();
 
-    setText(generateLabel());
+    this->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(this, SIGNAL(customContextMenuRequested(const QPoint&)), this, SLOT(showContextMenu(const QPoint&)));
 
     JoyAxisButton *nAxisButton = axis->getNAxisButton();
     JoyAxisButton *pAxisButton = axis->getPAxisButton();
 
-    connect(axis, SIGNAL(active(int)), this, SLOT(flash()));
-    connect(axis, SIGNAL(released(int)), this, SLOT(unflash()));
+    tryFlash();
+
     connect(axis, SIGNAL(throttleChanged()), this, SLOT(refreshLabel()));
-    connect(nAxisButton, SIGNAL(slotsChanged()), this, SLOT(refreshLabel()));
-    connect(pAxisButton, SIGNAL(slotsChanged()), this, SLOT(refreshLabel()));
+    connect(axis, SIGNAL(axisNameChanged()), this, SLOT(refreshLabel()));
+
+    //connect(nAxisButton, SIGNAL(slotsChanged()), this, SLOT(refreshLabel()));
+    //connect(pAxisButton, SIGNAL(slotsChanged()), this, SLOT(refreshLabel()));
+    connect(nAxisButton, SIGNAL(propertyUpdated()), this, SLOT(refreshLabel()));
+    connect(pAxisButton, SIGNAL(propertyUpdated()), this, SLOT(refreshLabel()));
+    connect(nAxisButton, SIGNAL(activeZoneChanged()), this, SLOT(refreshLabel()));
+    connect(pAxisButton, SIGNAL(activeZoneChanged()), this, SLOT(refreshLabel()));
+
+    axis->establishPropertyUpdatedConnection();
+    nAxisButton->establishPropertyUpdatedConnections();
+    pAxisButton->establishPropertyUpdatedConnections();
 }
 
 JoyAxis* JoyAxisWidget::getAxis()
@@ -29,74 +55,45 @@ JoyAxis* JoyAxisWidget::getAxis()
     return axis;
 }
 
-void JoyAxisWidget::flash()
-{
-    isflashing = true;
-
-    this->style()->unpolish(this);
-    this->style()->polish(this);
-
-    emit flashed(isflashing);
-}
-
-void JoyAxisWidget::unflash()
-{
-    isflashing = false;
-
-    this->style()->unpolish(this);
-    this->style()->polish(this);
-
-    emit flashed(isflashing);
-}
-
-void JoyAxisWidget::refreshLabel()
-{
-    setText(generateLabel());
-}
-
 void JoyAxisWidget::disableFlashes()
 {
-    disconnect(axis, SIGNAL(active(int)), 0, 0);
-    disconnect(axis, SIGNAL(released(int)), 0, 0);
+    disconnect(axis, SIGNAL(active(int)), this, SLOT(flash()));
+    disconnect(axis, SIGNAL(released(int)), this, SLOT(unflash()));
     this->unflash();
 }
 
 void JoyAxisWidget::enableFlashes()
 {
-    connect(axis, SIGNAL(active(int)), this, SLOT(flash()));
-    connect(axis, SIGNAL(released(int)), this, SLOT(unflash()));
+    connect(axis, SIGNAL(active(int)), this, SLOT(flash()), Qt::QueuedConnection);
+    connect(axis, SIGNAL(released(int)), this, SLOT(unflash()), Qt::QueuedConnection);
 }
 
-bool JoyAxisWidget::isButtonFlashing()
-{
-    return isflashing;
-}
-
+/**
+ * @brief Generate the string that will be displayed on the button
+ * @return Display string
+ */
 QString JoyAxisWidget::generateLabel()
 {
     QString temp;
-    temp = axis->getName().replace("&", "&&");
+    temp = axis->getName(false, displayNames).replace("&", "&&");
     return temp;
 }
 
-void JoyAxisWidget::paintEvent(QPaintEvent *event)
+void JoyAxisWidget::showContextMenu(const QPoint &point)
 {
-    Q_UNUSED(event);
+    QPoint globalPos = this->mapToGlobal(point);
+    JoyAxisContextMenu *contextMenu = new JoyAxisContextMenu(axis, this);
+    contextMenu->buildMenu();
+    contextMenu->popup(globalPos);
+}
 
-    QPainter painter(this);
+void JoyAxisWidget::tryFlash()
+{
+    JoyAxisButton *nAxisButton = axis->getNAxisButton();
+    JoyAxisButton *pAxisButton = axis->getPAxisButton();
 
-    QFontMetrics fm = this->fontMetrics();
-    QFont tempWidgetFont = this->font();
-    QFont tempScaledFont = painter.font();
-
-    while ((this->width() < fm.width(text())) && tempScaledFont.pointSize() >= 6)
+    if (nAxisButton->getButtonState() || pAxisButton->getButtonState())
     {
-        tempScaledFont.setPointSize(painter.font().pointSize()-2);
-        painter.setFont(tempScaledFont);
-        fm = painter.fontMetrics();
+        flash();
     }
-
-    this->setFont(tempScaledFont);
-    QPushButton::paintEvent(event);
-    this->setFont(tempWidgetFont);
 }

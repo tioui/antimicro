@@ -2,6 +2,8 @@
 .*.swp
 .directory
 *.qm
+*.diff
+*.mo
 Makefile
 antimicro
 !share/antimicro
@@ -11,3 +13,12 @@ moc_*
 qrc_resources.cpp
 ui_*.h
 *.*~
+SDL2-2.0.3/
+windows/*.msi
+windows/*.wix*
+build/
+Build/
+CMakeLists.txt.user*
+other/antimicro.1.gz
+doc/
+src/Changelog

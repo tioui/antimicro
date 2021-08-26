@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>650</width>
-    <height>570</height>
+    <height>580</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -20,15 +20,18 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>AntiMicro</string>
+   <string>antimicro</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="resources.qrc">
+    <normaloff>:/images/antimicro.png</normaloff>:/images/antimicro.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">JoyButtonWidget[isflashing=&quot;true&quot;],
 JoyAxisWidget[isflashing=&quot;true&quot;],
 JoyControlStickPushButton[isflashing=&quot;true&quot;],
 JoyControlStickButtonPushButton[isflashing=&quot;true&quot;],
-DPadPushButton[isflashing=&quot;true&quot;],
-VirtualDPadPushButton[isflashing=&quot;true&quot;] {
+DPadPushButton[isflashing=&quot;true&quot;] {
     background-color: rgb(0, 0, 255);
 	color: rgb(205, 197, 191);
 }
@@ -43,10 +46,17 @@ QPushButton#setPushButton7[setActive=&quot;false&quot;],
 QPushButton#setPushButton8[setActive=&quot;false&quot;] {
 	background-color: rgb(190, 190, 190);
 }
-</string>
+
+QStackedWidget#stackedWidget{
+    padding-top: 10px;
+}
+
+QPushButton#namesPushButton[isDisplayingNames=&quot;true&quot;] {
+	background-color: rgb(192, 255, 192);
+}</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <layout class="QGridLayout" name="gridLayout_2">
+   <layout class="QVBoxLayout" name="verticalLayout">
     <property name="leftMargin">
      <number>4</number>
     </property>
@@ -56,10 +66,10 @@ QPushButton#setPushButton8[setActive=&quot;false&quot;] {
     <property name="bottomMargin">
      <number>0</number>
     </property>
-    <item row="0" column="0">
+    <item>
      <widget class="QStackedWidget" name="stackedWidget">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
@@ -74,13 +84,10 @@ QPushButton#setPushButton8[setActive=&quot;false&quot;] {
        <number>1</number>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="page1">
-       <layout class="QVBoxLayout" name="verticalLayout_4">
-        <property name="margin">
-         <number>0</number>
-        </property>
+       <layout class="QVBoxLayout" name="verticalLayout_2">
         <item>
          <widget class="QLabel" name="label">
           <property name="text">
@@ -101,14 +108,26 @@ QPushButton#setPushButton8[setActive=&quot;false&quot;] {
        </layout>
       </widget>
       <widget class="QWidget" name="joystick_tabs">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
        <layout class="QVBoxLayout" name="verticalLayout_3">
         <property name="margin">
          <number>0</number>
         </property>
         <item>
-         <widget class="QTabWidget" name="tabWidget">
+         <widget class="JoyTabWidgetContainer" name="tabWidget">
           <property name="enabled">
            <bool>true</bool>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
           </property>
           <property name="layoutDirection">
            <enum>Qt::LeftToRight</enum>
@@ -120,7 +139,7 @@ QPushButton#setPushButton8[setActive=&quot;false&quot;] {
            <enum>QTabWidget::Rounded</enum>
           </property>
           <property name="currentIndex">
-           <number>0</number>
+           <number>-1</number>
           </property>
           <property name="usesScrollButtons">
            <bool>true</bool>
@@ -134,406 +153,26 @@ QPushButton#setPushButton8[setActive=&quot;false&quot;] {
           <property name="movable">
            <bool>false</bool>
           </property>
-          <widget class="QWidget" name="tab">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <attribute name="title">
-            <string>Tab 1</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout">
-              <item>
-               <widget class="QComboBox" name="configBox">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="editable">
-                 <bool>false</bool>
-                </property>
-                <item>
-                 <property name="text">
-                  <string>&lt;None&gt;</string>
-                 </property>
-                </item>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeType">
-                 <enum>QSizePolicy::Fixed</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>30</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButton_8">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Load</string>
-                </property>
-                <property name="icon">
-                 <iconset theme="document-open">
-                  <normaloff/>
-                 </iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButton_7">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>90</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Save</string>
-                </property>
-                <property name="icon">
-                 <iconset theme="document-save">
-                  <normaloff/>
-                 </iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButton_2">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>0</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="maximumSize">
-                 <size>
-                  <width>16777215</width>
-                  <height>16777215</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Save As</string>
-                </property>
-                <property name="icon">
-                 <iconset theme="document-save-as">
-                  <normaloff/>
-                 </iconset>
-                </property>
-                <property name="autoDefault">
-                 <bool>false</bool>
-                </property>
-                <property name="default">
-                 <bool>false</bool>
-                </property>
-                <property name="flat">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_2">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>5</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QStackedWidget" name="stackedWidget_2">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
-              </property>
-              <property name="currentIndex">
-               <number>0</number>
-              </property>
-              <widget class="QWidget" name="page">
-               <layout class="QVBoxLayout" name="verticalLayout">
-                <item>
-                 <widget class="QScrollArea" name="scrollArea">
-                  <property name="widgetResizable">
-                   <bool>true</bool>
-                  </property>
-                  <widget class="QWidget" name="scrollAreaWidgetContents">
-                   <property name="geometry">
-                    <rect>
-                     <x>0</x>
-                     <y>0</y>
-                     <width>612</width>
-                     <height>357</height>
-                    </rect>
-                   </property>
-                   <property name="sizePolicy">
-                    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-                     <horstretch>0</horstretch>
-                     <verstretch>0</verstretch>
-                    </sizepolicy>
-                   </property>
-                   <layout class="QFormLayout" name="formLayout">
-                    <property name="fieldGrowthPolicy">
-                     <enum>QFormLayout::ExpandingFieldsGrow</enum>
-                    </property>
-                   </layout>
-                  </widget>
-                 </widget>
-                </item>
-               </layout>
-              </widget>
-              <widget class="QWidget" name="page_2"/>
-              <widget class="QWidget" name="page_3"/>
-              <widget class="QWidget" name="page_4"/>
-              <widget class="QWidget" name="page_5"/>
-              <widget class="QWidget" name="page_6"/>
-              <widget class="QWidget" name="page_7"/>
-              <widget class="QWidget" name="page_8"/>
-             </widget>
-            </item>
-            <item>
-             <spacer name="verticalSpacer_3">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_2">
-              <item>
-               <widget class="QPushButton" name="setPushButton1">
-                <property name="styleSheet">
-                 <string notr="true"/>
-                </property>
-                <property name="text">
-                 <string>1</string>
-                </property>
-                <property name="setActive" stdset="0">
-                 <bool>true</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="setPushButton2">
-                <property name="text">
-                 <string>2</string>
-                </property>
-                <property name="setActive" stdset="0">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="setPushButton3">
-                <property name="text">
-                 <string>3</string>
-                </property>
-                <property name="setActive" stdset="0">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="setPushButton4">
-                <property name="text">
-                 <string>4</string>
-                </property>
-                <property name="setActive" stdset="0">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="setPushButton5">
-                <property name="text">
-                 <string>5</string>
-                </property>
-                <property name="setActive" stdset="0">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="setPushButton6">
-                <property name="text">
-                 <string>6</string>
-                </property>
-                <property name="setActive" stdset="0">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="setPushButton7">
-                <property name="text">
-                 <string>7</string>
-                </property>
-                <property name="setActive" stdset="0">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="setPushButton8">
-                <property name="text">
-                 <string>8</string>
-                </property>
-                <property name="setActive" stdset="0">
-                 <bool>false</bool>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-            <item>
-             <spacer name="verticalSpacer">
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeType">
-               <enum>QSizePolicy::Fixed</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>20</width>
-                <height>5</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <layout class="QHBoxLayout" name="horizontalLayout_3">
-              <item>
-               <widget class="QPushButton" name="stickAssignPushButton">
-                <property name="text">
-                 <string>Stick/Pad Assign</string>
-                </property>
-                <property name="icon">
-                 <iconset theme="games-config-options">
-                  <normaloff/>
-                 </iconset>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <widget class="QPushButton" name="quickSetPushButton">
-                <property name="text">
-                 <string>Quick Set</string>
-                </property>
-               </widget>
-              </item>
-              <item>
-               <spacer name="horizontalSpacer_2">
-                <property name="orientation">
-                 <enum>Qt::Horizontal</enum>
-                </property>
-                <property name="sizeHint" stdset="0">
-                 <size>
-                  <width>40</width>
-                  <height>20</height>
-                 </size>
-                </property>
-               </spacer>
-              </item>
-              <item>
-               <widget class="QPushButton" name="pushButton_9">
-                <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                  <horstretch>0</horstretch>
-                  <verstretch>0</verstretch>
-                 </sizepolicy>
-                </property>
-                <property name="minimumSize">
-                 <size>
-                  <width>75</width>
-                  <height>0</height>
-                 </size>
-                </property>
-                <property name="text">
-                 <string>Reset</string>
-                </property>
-                <property name="icon">
-                 <iconset theme="document-revert">
-                  <normaloff/>
-                 </iconset>
-                </property>
-               </widget>
-              </item>
-             </layout>
-            </item>
-           </layout>
-           <zorder>verticalSpacer_3</zorder>
-           <zorder>stackedWidget_2</zorder>
-          </widget>
-          <widget class="QWidget" name="tab_2">
-           <attribute name="title">
-            <string>Tab 2</string>
-           </attribute>
-           <layout class="QVBoxLayout" name="verticalLayout_2"/>
-          </widget>
          </widget>
         </item>
        </layout>
       </widget>
+     </widget>
+    </item>
+    <item>
+     <widget class="QPushButton" name="uacPushButton">
+      <property name="text">
+       <string>If events are not seen by a game, please click here to run this application as the Adminstrator.</string>
+      </property>
+      <property name="autoDefault">
+       <bool>false</bool>
+      </property>
+      <property name="default">
+       <bool>false</bool>
+      </property>
+      <property name="flat">
+       <bool>false</bool>
+      </property>
      </widget>
     </item>
    </layout>
@@ -549,7 +188,7 @@ QPushButton#setPushButton8[setActive=&quot;false&quot;] {
    </property>
    <widget class="QMenu" name="menuQuit">
     <property name="title">
-     <string>&amp;File</string>
+     <string>&amp;App</string>
     </property>
     <addaction name="actionHide"/>
     <addaction name="actionQuit"/>
@@ -558,26 +197,26 @@ QPushButton#setPushButton8[setActive=&quot;false&quot;] {
     <property name="title">
      <string>&amp;Options</string>
     </property>
+    <addaction name="actionProperties"/>
+    <addaction name="actionKeyValue"/>
+    <addaction name="actionGameController_Mapping"/>
+    <addaction name="actionStick_Pad_Assign"/>
+    <addaction name="actionOptions"/>
     <addaction name="actionUpdate_Joysticks"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
      <string>&amp;Help</string>
     </property>
+    <addaction name="actionGitHubPage"/>
+    <addaction name="actionWiki"/>
+    <addaction name="separator"/>
     <addaction name="actionAbout"/>
     <addaction name="actionAbout_Qt"/>
    </widget>
    <addaction name="menuQuit"/>
    <addaction name="menuOptions"/>
    <addaction name="menuHelp"/>
-  </widget>
-  <widget class="QToolBar" name="mainToolBar">
-   <attribute name="toolBarArea">
-    <enum>TopToolBarArea</enum>
-   </attribute>
-   <attribute name="toolBarBreak">
-    <bool>false</bool>
-   </attribute>
   </widget>
   <action name="actionQuit">
    <property name="icon">
@@ -639,15 +278,65 @@ QPushButton#setPushButton8[setActive=&quot;false&quot;] {
     <string>About Qt</string>
    </property>
   </action>
+  <action name="actionProperties">
+   <property name="text">
+    <string>Properties</string>
+   </property>
+  </action>
+  <action name="actionKeyValue">
+   <property name="text">
+    <string>Key Checker</string>
+   </property>
+  </action>
+  <action name="actionHomePage">
+   <property name="text">
+    <string>Home Page</string>
+   </property>
+  </action>
+  <action name="actionGitHubPage">
+   <property name="text">
+    <string>GitHub Page</string>
+   </property>
+  </action>
+  <action name="actionGameController_Mapping">
+   <property name="text">
+    <string>Game Controller Mapping</string>
+   </property>
+  </action>
+  <action name="actionOptions">
+   <property name="text">
+    <string>Settings</string>
+   </property>
+  </action>
+  <action name="actionStick_Pad_Assign">
+   <property name="text">
+    <string>Stick/Pad Assign</string>
+   </property>
+  </action>
+  <action name="actionWiki">
+   <property name="text">
+    <string>Wiki</string>
+   </property>
+  </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources/>
+ <customwidgets>
+  <customwidget>
+   <class>JoyTabWidgetContainer</class>
+   <extends>QTabWidget</extends>
+   <header>joytabwidgetcontainer.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>actionQuit</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
-   <slot>close()</slot>
+   <slot>quitProgram()</slot>
    <hints>
     <hint type="sourcelabel">
      <x>-1</x>
@@ -661,7 +350,7 @@ QPushButton#setPushButton8[setActive=&quot;false&quot;] {
   </connection>
   <connection>
    <sender>actionUpdate_Joysticks</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>startJoystickRefresh()</slot>
    <hints>
@@ -677,7 +366,7 @@ QPushButton#setPushButton8[setActive=&quot;false&quot;] {
   </connection>
   <connection>
    <sender>actionHide</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>hideWindow()</slot>
    <hints>
@@ -693,7 +382,7 @@ QPushButton#setPushButton8[setActive=&quot;false&quot;] {
   </connection>
   <connection>
    <sender>actionAbout</sender>
-   <signal>activated()</signal>
+   <signal>triggered()</signal>
    <receiver>MainWindow</receiver>
    <slot>openAboutDialog()</slot>
    <hints>
@@ -707,10 +396,28 @@ QPushButton#setPushButton8[setActive=&quot;false&quot;] {
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionStick_Pad_Assign</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>showStickAssignmentDialog()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>324</x>
+     <y>289</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
   <slot>startJoystickRefresh()</slot>
   <slot>hideWindow()</slot>
   <slot>openAboutDialog()</slot>
+  <slot>quitProgram()</slot>
+  <slot>showStickAssignmentDialog()</slot>
  </slots>
 </ui>

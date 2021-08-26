@@ -1,3 +1,20 @@
+/* antimicro Gamepad to KB+M event mapper
+ * Copyright (C) 2015 Travis Nickles <nickles.travis@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #ifndef VIRTUALKEYBOARDMOUSEWIDGET_H
 #define VIRTUALKEYBOARDMOUSEWIDGET_H
 
@@ -11,11 +28,14 @@
 #include <QLabel>
 #include <QSpinBox>
 #include <QCheckBox>
+#include <QComboBox>
+#include <QMenu>
+#include <QAction>
 
-#include "keyboard/virtualkeypushbutton.h"
-#include "keyboard/virtualmousepushbutton.h"
-#include "joybutton.h"
-#include "advancebuttondialog.h"
+#include "virtualkeypushbutton.h"
+#include "virtualmousepushbutton.h"
+#include <joybutton.h>
+#include <advancebuttondialog.h>
 
 class VirtualKeyboardMouseWidget : public QTabWidget
 {
@@ -27,18 +47,6 @@ public:
     bool isKeyboardTabVisible();
 
 protected:
-    JoyButton *button;
-    QWidget *keyboardTab;
-    QWidget *mouseTab;
-    QLabel *mouseHorizSpeedLabel;
-    QLabel *mouseVertSpeedLabel;
-    QSpinBox *mouseHorizSpeedSpinBox;
-    QSpinBox *mouseVertSpeedSpinBox;
-    QPushButton *noneButton;
-    QCheckBox *mouseChangeTogether;
-
-    static QHash<QString, QString> topRowKeys;
-
     void setupVirtualKeyboardLayout();
     QVBoxLayout* setupMainKeyboardLayout();
     QVBoxLayout* setupAuxKeyboardLayout();
@@ -48,11 +56,29 @@ protected:
     VirtualKeyPushButton* createNewKey(QString xcodestring);
     QPushButton* createNoneKey();
     void populateTopRowKeys();
+    QPushButton* createOtherKeysMenu();
+
+    virtual void resizeEvent(QResizeEvent *event);
+
+    JoyButton *button;
+    QWidget *keyboardTab;
+    QWidget *mouseTab;
+    //QLabel *mouseHorizSpeedLabel;
+    //QLabel *mouseVertSpeedLabel;
+    //QSpinBox *mouseHorizSpeedSpinBox;
+    //QSpinBox *mouseVertSpeedSpinBox;
+    QPushButton *noneButton;
+    QPushButton *mouseSettingsPushButton;
+    //QCheckBox *mouseChangeTogether;
+    //QComboBox *mouseModeComboBox;
+    QMenu *otherKeysMenu;
+
+    static QHash<QString, QString> topRowKeys;
 
 signals:
     void selectionFinished();
     void selectionCleared();
-    void selectionMade(int keycode);
+    void selectionMade(int keycode, unsigned int alias);
     void selectionMade(JoyButtonSlot *slot);
 
 public slots:
@@ -62,18 +88,17 @@ public slots:
     void establishVirtualMouseAdvancedSignalConnections();
 
 private slots:
-    void processSingleKeyboardSelection(int keycode);
-    void processAdvancedKeyboardSelection(int keycode);
+    void processSingleKeyboardSelection(int keycode, unsigned int alias);
+    void processAdvancedKeyboardSelection(int keycode, unsigned int alias);
     void processSingleMouseSelection(JoyButtonSlot *tempslot);
     void processAdvancedMouseSelection(JoyButtonSlot *tempslot);
     void clearButtonSlots();
     void clearButtonSlotsFinish();
-    void syncSpeedSpinBoxes();
-    void moveSpeedsTogether(int value);
-    void updateHorizontalSpeedConvertLabel(int value);
-    void updateVerticalSpeedConvertLabel(int value);
-    void setButtonMouseHorizSpeed(int value);
-    void setButtonMouseVertiSpeed(int value);
+    void openMouseSettingsDialog();
+    void enableMouseSettingButton();
+    void setButtonFontSizes();
+    void otherKeysActionSingle(bool triggered);
+    void otherKeysActionAdvanced(bool triggered);
 };
 
 #endif // VIRTUALKEYBOARDMOUSEWIDGET_H

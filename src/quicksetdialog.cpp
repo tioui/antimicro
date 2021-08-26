@@ -1,3 +1,20 @@
+/* antimicro Gamepad to KB+M event mapper
+ * Copyright (C) 2015 Travis Nickles <nickles.travis@gmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 #include <QHash>
 #include <QHashIterator>
 
@@ -7,7 +24,7 @@
 #include "setjoystick.h"
 #include "buttoneditdialog.h"
 
-QuickSetDialog::QuickSetDialog(Joystick *joystick, QWidget *parent) :
+QuickSetDialog::QuickSetDialog(InputDevice *joystick, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::QuickSetDialog)
 {
@@ -18,12 +35,14 @@ QuickSetDialog::QuickSetDialog(Joystick *joystick, QWidget *parent) :
     this->joystick = joystick;
     this->currentButtonDialog = 0;
 
-    setWindowTitle(tr("Quick Set Joystick %1").arg(joystick->getRealJoyNumber()));
+    setWindowTitle(tr("Quick Set %1").arg(joystick->getName()));
 
     SetJoystick *currentset = joystick->getActiveSetJoystick();
+    currentset->release();
+    joystick->resetButtonDownCount();
 
     QString temp = ui->joystickDialogLabel->text();
-    temp = temp.arg(joystick->getRealJoyNumber());
+    temp = temp.arg(joystick->getSDLName()).arg(joystick->getName());
     ui->joystickDialogLabel->setText(temp);
 
     for (int i=0; i < currentset->getNumberSticks(); i++)
@@ -309,4 +328,6 @@ void QuickSetDialog::restoreButtonStates()
             disconnect(button, SIGNAL(clicked(int)), this, 0);
         }
     }
+
+    currentset->release();
 }

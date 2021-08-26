@@ -3,14 +3,14 @@
  <class>AdvanceButtonDialog</class>
  <widget class="QDialog" name="AdvanceButtonDialog">
   <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
+   <enum>Qt::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>750</width>
-    <height>400</height>
+    <height>439</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -22,16 +22,22 @@
   <property name="minimumSize">
    <size>
     <width>750</width>
-    <height>400</height>
+    <height>430</height>
    </size>
   </property>
   <property name="windowTitle">
    <string>Advanced</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true"/>
+  </property>
   <property name="modal">
    <bool>false</bool>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>6</number>
+   </property>
    <property name="topMargin">
     <number>4</number>
    </property>
@@ -94,19 +100,7 @@
         <number>0</number>
        </property>
        <widget class="QWidget" name="page">
-        <layout class="QVBoxLayout" name="verticalLayout_2">
-         <property name="leftMargin">
-          <number>8</number>
-         </property>
-         <property name="topMargin">
-          <number>0</number>
-         </property>
-         <property name="rightMargin">
-          <number>8</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
+        <layout class="QVBoxLayout" name="verticalLayout_9">
          <item>
           <widget class="QListWidget" name="slotListWidget">
            <property name="sizePolicy">
@@ -118,13 +112,13 @@
            <property name="minimumSize">
             <size>
              <width>0</width>
-             <height>80</height>
+             <height>100</height>
             </size>
            </property>
            <property name="maximumSize">
             <size>
              <width>16777215</width>
-             <height>80</height>
+             <height>100</height>
             </size>
            </property>
            <property name="autoFillBackground">
@@ -148,6 +142,9 @@
            <property name="flow">
             <enum>QListView::LeftToRight</enum>
            </property>
+           <property name="spacing">
+            <number>0</number>
+           </property>
            <property name="viewMode">
             <enum>QListView::ListMode</enum>
            </property>
@@ -167,98 +164,116 @@
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>20</height>
+             <height>10</height>
             </size>
            </property>
           </spacer>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_12">
-           <item>
-            <layout class="QGridLayout" name="gridLayout_2">
-             <item row="0" column="0">
-              <widget class="QPushButton" name="pausePushButton">
-               <property name="toolTip">
-                <string>Insert a pause that occurs in between key presses.</string>
-               </property>
-               <property name="text">
-                <string>Pause</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="1">
-              <widget class="QPushButton" name="distancePushButton">
-               <property name="toolTip">
-                <string>Distance action specifies that the slots afterwards
-will only be executed when an axis is moved
-a certain range past the designated dead zone.</string>
-               </property>
-               <property name="text">
-                <string>Distance</string>
-               </property>
-              </widget>
-             </item>
-             <item row="0" column="1">
-              <widget class="QPushButton" name="holdPushButton">
-               <property name="toolTip">
-                <string>Insert a hold action. Slots after the action will only be
-executed if the button is held past the interval specified.</string>
-               </property>
-               <property name="statusTip">
-                <string/>
-               </property>
-               <property name="whatsThis">
-                <string/>
-               </property>
-               <property name="text">
-                <string>Hold</string>
-               </property>
-              </widget>
-             </item>
-             <item row="1" column="0">
-              <widget class="QPushButton" name="cyclePushButton">
-               <property name="toolTip">
-                <string>Slots past a Cycle action will be executed
-on the next button press. Multiple cycles can be added
-in order to create partitions in a sequence.</string>
-               </property>
-               <property name="text">
-                <string>Cycle</string>
-               </property>
-              </widget>
-             </item>
-             <item row="2" column="0">
-              <widget class="QPushButton" name="releasePushButton">
-               <property name="toolTip">
-                <string>Insert a release action. Slots after the action will only be
-executed after a button release if the button was held
-past the interval specified.</string>
-               </property>
-               <property name="text">
-                <string>Release</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
             <spacer name="horizontalSpacer">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
              <property name="sizeType">
-              <enum>QSizePolicy::MinimumExpanding</enum>
+              <enum>QSizePolicy::Fixed</enum>
              </property>
              <property name="sizeHint" stdset="0">
               <size>
-               <width>30</width>
+               <width>50</width>
                <height>20</height>
               </size>
              </property>
             </spacer>
            </item>
            <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <widget class="QComboBox" name="slotTypeComboBox">
+             <item>
+              <property name="text">
+               <string>Blank or KB/M</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Cycle</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Delay</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Distance</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Execute</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Hold</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Load</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Mouse Mod</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Pause</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Press Time</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Release</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Set Change</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Text Entry</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <spacer name="horizontalSpacer_2">
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>50</width>
+               <height>20</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="verticalLayout_2">
              <item>
               <widget class="QPushButton" name="insertSlotButton">
                <property name="toolTip">
@@ -319,283 +334,378 @@ past the interval specified.</string>
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>50</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-         <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <property name="spacing">
-            <number>40</number>
-           </property>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_9">
-             <item>
-              <widget class="QLabel" name="label_5">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="font">
-                <font>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="toolTip">
-                <string>Specify the duration of an inserted Pause or Hold slot.</string>
-               </property>
-               <property name="text">
-                <string>Time:</string>
-               </property>
-              </widget>
-             </item>
-             <item>
-              <widget class="QLabel" name="actionTimeLabel">
-               <property name="font">
-                <font>
-                 <weight>75</weight>
-                 <bold>true</bold>
-                </font>
-               </property>
-               <property name="text">
-                <string>0.01s</string>
-               </property>
-              </widget>
-             </item>
-            </layout>
-           </item>
-           <item>
-            <layout class="QHBoxLayout" name="horizontalLayout_10">
-             <property name="spacing">
-              <number>1</number>
-             </property>
-             <item>
-              <widget class="QComboBox" name="actionSecondsComboBox">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="maxVisibleItems">
-                <number>11</number>
-               </property>
-               <item>
-                <property name="text">
-                 <string>0s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>1s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>2s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>3s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>4s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>5s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>6s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>7s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>8s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>9s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>10s</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-             <item>
-              <spacer name="horizontalSpacer_5">
-               <property name="orientation">
-                <enum>Qt::Horizontal</enum>
-               </property>
-               <property name="sizeType">
-                <enum>QSizePolicy::Fixed</enum>
-               </property>
-               <property name="sizeHint" stdset="0">
-                <size>
-                 <width>10</width>
-                 <height>20</height>
-                </size>
-               </property>
-              </spacer>
-             </item>
-             <item>
-              <widget class="QComboBox" name="actionMillisecondsComboBox">
-               <property name="sizePolicy">
-                <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-                 <horstretch>0</horstretch>
-                 <verstretch>0</verstretch>
-                </sizepolicy>
-               </property>
-               <property name="minimumSize">
-                <size>
-                 <width>100</width>
-                 <height>0</height>
-                </size>
-               </property>
-               <property name="currentIndex">
-                <number>1</number>
-               </property>
-               <item>
-                <property name="text">
-                 <string>0.0s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>0.1s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>0.2s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>0.3s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>0.4s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>0.5s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>0.6s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>0.7s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>0.8s</string>
-                </property>
-               </item>
-               <item>
-                <property name="text">
-                 <string>0.9s</string>
-                </property>
-               </item>
-              </widget>
-             </item>
-            </layout>
-           </item>
-          </layout>
-         </item>
-         <item>
-          <spacer name="verticalSpacer_7">
-           <property name="orientation">
-            <enum>Qt::Vertical</enum>
-           </property>
-           <property name="sizeType">
-            <enum>QSizePolicy::Fixed</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>20</width>
              <height>20</height>
             </size>
            </property>
           </spacer>
          </item>
          <item>
-          <layout class="QHBoxLayout" name="horizontalLayout_11">
-           <property name="spacing">
-            <number>20</number>
+          <widget class="QLabel" name="slotTypeHelpLabel">
+           <property name="text">
+            <string>Placeholder</string>
            </property>
-           <item>
-            <widget class="QLabel" name="label_6">
-             <property name="font">
-              <font>
-               <weight>75</weight>
-               <bold>true</bold>
-              </font>
-             </property>
-             <property name="toolTip">
-              <string>Specify the range past an axis dead zone in which a sequence of actions will execute.</string>
-             </property>
-             <property name="text">
-              <string>Distance: </string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSpinBox" name="distanceSpinBox">
-             <property name="minimumSize">
-              <size>
-               <width>81</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="suffix">
-              <string>%</string>
-             </property>
-             <property name="minimum">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <number>100</number>
-             </property>
-             <property name="singleStep">
-              <number>1</number>
-             </property>
-            </widget>
-           </item>
-          </layout>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QStackedWidget" name="slotControlsStackedWidget">
+           <property name="currentIndex">
+            <number>0</number>
+           </property>
+           <widget class="QWidget" name="timePage">
+            <layout class="QVBoxLayout" name="verticalLayout_12">
+             <item>
+              <spacer name="verticalSpacer_7">
+               <property name="orientation">
+                <enum>Qt::Vertical</enum>
+               </property>
+               <property name="sizeType">
+                <enum>QSizePolicy::Fixed</enum>
+               </property>
+               <property name="sizeHint" stdset="0">
+                <size>
+                 <width>20</width>
+                 <height>20</height>
+                </size>
+               </property>
+              </spacer>
+             </item>
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_2">
+               <property name="spacing">
+                <number>40</number>
+               </property>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_9">
+                 <item>
+                  <widget class="QLabel" name="label_5">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="font">
+                    <font>
+                     <weight>75</weight>
+                     <bold>true</bold>
+                    </font>
+                   </property>
+                   <property name="toolTip">
+                    <string>Specify the duration of an inserted Pause or Hold slot.</string>
+                   </property>
+                   <property name="text">
+                    <string>Time:</string>
+                   </property>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QLabel" name="actionTimeLabel">
+                   <property name="font">
+                    <font>
+                     <weight>50</weight>
+                     <bold>false</bold>
+                    </font>
+                   </property>
+                   <property name="text">
+                    <string>0.01s</string>
+                   </property>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+               <item>
+                <layout class="QHBoxLayout" name="horizontalLayout_10">
+                 <property name="spacing">
+                  <number>10</number>
+                 </property>
+                 <item>
+                  <widget class="QComboBox" name="actionMinutesComboBox">
+                   <item>
+                    <property name="text">
+                     <string>0m</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="actionSecondsComboBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="maxVisibleItems">
+                    <number>11</number>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>0</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="actionTenthsComboBox">
+                   <property name="sizePolicy">
+                    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+                     <horstretch>0</horstretch>
+                     <verstretch>0</verstretch>
+                    </sizepolicy>
+                   </property>
+                   <property name="minimumSize">
+                    <size>
+                     <width>0</width>
+                     <height>0</height>
+                    </size>
+                   </property>
+                   <property name="currentIndex">
+                    <number>0</number>
+                   </property>
+                   <item>
+                    <property name="text">
+                     <string>0</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                 <item>
+                  <widget class="QComboBox" name="actionHundredthsComboBox">
+                   <item>
+                    <property name="text">
+                     <string>0s</string>
+                    </property>
+                   </item>
+                  </widget>
+                 </item>
+                </layout>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="mouseModPage">
+            <layout class="QVBoxLayout" name="verticalLayout_11">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_6">
+               <item>
+                <widget class="QLabel" name="label_8">
+                 <property name="font">
+                  <font>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="toolTip">
+                  <string/>
+                 </property>
+                 <property name="text">
+                  <string>Mouse Speed Mod:</string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>mouseSpeedModSpinBox</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="mouseSpeedModSpinBox">
+                 <property name="minimumSize">
+                  <size>
+                   <width>81</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Set the percentage that mouse speeds will be modified by.</string>
+                 </property>
+                 <property name="suffix">
+                  <string>%</string>
+                 </property>
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                 <property name="maximum">
+                  <number>400</number>
+                 </property>
+                 <property name="singleStep">
+                  <number>1</number>
+                 </property>
+                 <property name="value">
+                  <number>100</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="distancePage">
+            <layout class="QVBoxLayout" name="verticalLayout_13">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_11">
+               <property name="spacing">
+                <number>20</number>
+               </property>
+               <item>
+                <widget class="QLabel" name="label_6">
+                 <property name="font">
+                  <font>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="toolTip">
+                  <string>Specify the range past an axis dead zone in which a sequence of actions will execute.</string>
+                 </property>
+                 <property name="text">
+                  <string>Distance: </string>
+                 </property>
+                 <property name="buddy">
+                  <cstring>distanceSpinBox</cstring>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QSpinBox" name="distanceSpinBox">
+                 <property name="minimumSize">
+                  <size>
+                   <width>81</width>
+                   <height>0</height>
+                  </size>
+                 </property>
+                 <property name="toolTip">
+                  <string>Specify the range past an axis dead zone in which a sequence of actions will execute.</string>
+                 </property>
+                 <property name="suffix">
+                  <string>%</string>
+                 </property>
+                 <property name="minimum">
+                  <number>1</number>
+                 </property>
+                 <property name="maximum">
+                  <number>100</number>
+                 </property>
+                 <property name="singleStep">
+                  <number>1</number>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="resetCyclePage">
+            <layout class="QVBoxLayout" name="verticalLayout_14">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_7">
+               <property name="spacing">
+                <number>10</number>
+               </property>
+               <item>
+                <widget class="QCheckBox" name="autoResetCycleCheckBox">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>Auto Reset Cycle After</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QDoubleSpinBox" name="resetCycleDoubleSpinBox">
+                 <property name="enabled">
+                  <bool>false</bool>
+                 </property>
+                 <property name="maximum">
+                  <double>60.000000000000000</double>
+                 </property>
+                 <property name="singleStep">
+                  <double>0.500000000000000</double>
+                 </property>
+                 <property name="value">
+                  <double>1.000000000000000</double>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QLabel" name="resetCycleSecondsLabel">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="font">
+                  <font>
+                   <weight>75</weight>
+                   <bold>true</bold>
+                  </font>
+                 </property>
+                 <property name="text">
+                  <string>seconds</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="loadPage">
+            <layout class="QVBoxLayout" name="verticalLayout_16">
+             <item>
+              <widget class="QPushButton" name="loadProfilePushButton">
+               <property name="text">
+                <string>Choose Profile</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="slotSetChangePage">
+            <layout class="QVBoxLayout" name="verticalLayout_15">
+             <item>
+              <widget class="QComboBox" name="slotSetChangeComboBox"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="textEntryPage">
+            <layout class="QVBoxLayout" name="verticalLayout_17">
+             <item>
+              <widget class="QLineEdit" name="textEntryLineEdit"/>
+             </item>
+            </layout>
+           </widget>
+           <widget class="QWidget" name="execPage">
+            <layout class="QVBoxLayout" name="verticalLayout_18">
+             <item>
+              <layout class="QHBoxLayout" name="horizontalLayout_12">
+               <item>
+                <widget class="QLineEdit" name="execLineEdit"/>
+               </item>
+               <item>
+                <widget class="QToolButton" name="execToolButton">
+                 <property name="text">
+                  <string>...</string>
+                 </property>
+                </widget>
+               </item>
+              </layout>
+             </item>
+            </layout>
+           </widget>
+          </widget>
          </item>
          <item>
           <spacer name="verticalSpacer_6">
@@ -608,18 +718,19 @@ past the interval specified.</string>
            <property name="sizeHint" stdset="0">
             <size>
              <width>20</width>
-             <height>20</height>
+             <height>10</height>
             </size>
            </property>
           </spacer>
          </item>
         </layout>
-        <zorder>verticalSpacer_2</zorder>
         <zorder>verticalSpacer_5</zorder>
         <zorder>slotListWidget</zorder>
         <zorder></zorder>
         <zorder>verticalSpacer_6</zorder>
-        <zorder>verticalSpacer_7</zorder>
+        <zorder>slotControlsStackedWidget</zorder>
+        <zorder>slotTypeHelpLabel</zorder>
+        <zorder>verticalSpacer_2</zorder>
        </widget>
        <widget class="QWidget" name="page_2">
         <layout class="QVBoxLayout" name="verticalLayout_7">
@@ -660,34 +771,74 @@ past the interval specified.</string>
         </layout>
        </widget>
        <widget class="QWidget" name="page_3">
-        <layout class="QVBoxLayout" name="verticalLayout_4">
+        <layout class="QVBoxLayout" name="verticalLayout_10">
          <item>
-          <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0">
-           <property name="spacing">
-            <number>20</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_8">
            <item>
-            <widget class="QLabel" name="label">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Enabled</string>
-             </property>
-            </widget>
+            <layout class="QVBoxLayout" name="verticalLayout_4">
+             <item>
+              <widget class="QLabel" name="label">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Enabled</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QCheckBox" name="turboCheckbox">
+               <property name="text">
+                <string/>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
            <item>
-            <widget class="QCheckBox" name="turboCheckbox">
-             <property name="text">
-              <string/>
-             </property>
-            </widget>
+            <layout class="QVBoxLayout" name="verticalLayout_3">
+             <item>
+              <widget class="QLabel" name="turboModeLabel">
+               <property name="sizePolicy">
+                <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+                 <horstretch>0</horstretch>
+                 <verstretch>0</verstretch>
+                </sizepolicy>
+               </property>
+               <property name="text">
+                <string>Mode:</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QComboBox" name="turboModeComboBox">
+               <property name="enabled">
+                <bool>false</bool>
+               </property>
+               <property name="toolTip">
+                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Normal: Repeatedly press and release a button by the chosen rate.&lt;/p&gt;&lt;p&gt;Gradient: Modify the button press and button release delay based on how far an axis has been moved. The rate will remain the same.&lt;/p&gt;&lt;p&gt;Pulse: Modify how many times a button is pressed and released per second. The button delay will remain the same.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               </property>
+               <item>
+                <property name="text">
+                 <string>Normal</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Gradient</string>
+                </property>
+               </item>
+               <item>
+                <property name="text">
+                 <string>Pulse</string>
+                </property>
+               </item>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </item>
@@ -710,7 +861,7 @@ past the interval specified.</string>
          <item>
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <property name="spacing">
-            <number>-1</number>
+            <number>6</number>
            </property>
            <property name="topMargin">
             <number>0</number>
@@ -782,7 +933,7 @@ past the interval specified.</string>
             <number>0</number>
            </property>
            <property name="maximum">
-            <number>200</number>
+            <number>400</number>
            </property>
            <property name="pageStep">
             <number>10</number>
